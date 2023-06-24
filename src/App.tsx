@@ -1,26 +1,53 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { initWebGl } from "./webgl/init";
+import {
+  initStickyNote,
+  bindStickyNote,
+  drawStickyNote,
+} from "./webgl/stickyNote";
+import { useRef, useEffect, useState } from "react";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const canvasRef = useRef(null);
+  const [canvas, setCanvas] = useState<any>(null);
+  const [gl, setGl] = useState(null);
+
+  useEffect(() => {
+    const canvas: any = canvasRef.current;
+    setCanvas(canvas);
+    const gl = canvas.getContext("webgl2");
+    setGl(gl);
+  }, []);
+
+  useEffect(() => {
+    console.log(gl);
+    if (gl) {
+      initWebGl({ gl: gl });
+
+      const stickyNoteContext = initStickyNote({ gl: gl });
+      bindStickyNote({ gl: gl }, stickyNoteContext);
+    }
+  }, [gl]);
+
+  useEffect(() => {
+    canvas.addEventListener("mousedown", (e: any) => {
+      let rect = canvas.getBoundingClientRect();
+      let x = e.clientX - rect.left;
+      let y = e.clientY - rect.top;
+
+      const stickyNoteContext = initStickyNote({ gl: gl });
+      bindStickyNote({ gl: gl }, stickyNoteContext);
+
+      drawStickyNote(
+        { gl: gl },
+        stickyNoteContext,
+        { x, y },
+        { r: 1, g: 0, b: 0 }
+      );
+    });
+  }, [canvas]);
+
+  return <canvas ref={canvasRef} id="main" />;
 }
 
 export default App;
