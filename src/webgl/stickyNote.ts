@@ -84,10 +84,40 @@ export const drawStickyNote = (
   color: any
 ) => {
   console.log("drawing sticky note");
-  console.log(stickyNoteContext);
-  console.log(location);
-  console.log(color);
   const { gl } = glContext;
+
+  const primitiveType = gl.TRIANGLES;
+  const offset = 0;
+  const count = 6;
+
+  const bx1 = location.x - 2;
+  const bx2 = bx1 + NOTE_WIDTH + 4;
+
+  const by1 = location.y - 2;
+  const by2 = by1 + NOTE_HEIGHT + 4;
+
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array([
+      bx1,
+      by1,
+      bx2,
+      by1,
+      bx1,
+      by2,
+      bx1,
+      by2,
+      bx2,
+      by1,
+      bx2,
+      by2,
+    ]),
+    gl.STATIC_DRAW
+  );
+
+  gl.uniform4f(stickyNoteContext.colorLocation, 0, 0, 0, 1);
+
+  gl.drawArrays(primitiveType, offset, count);
 
   const x1 = location.x;
   const x2 = x1 + NOTE_WIDTH;
@@ -100,14 +130,7 @@ export const drawStickyNote = (
     new Float32Array([x1, y1, x2, y1, x1, y2, x1, y2, x2, y1, x2, y2]),
     gl.STATIC_DRAW
   );
-
   gl.uniform4f(stickyNoteContext.colorLocation, color.r, color.g, color.b, 1);
 
-  gl.clearColor(0, 0, 0, 0);
-  gl.clear(gl.COLOR_BUFFER_BIT);
-
-  const primitiveType = gl.TRIANGLES;
-  const offset = 0;
-  const count = 6;
   gl.drawArrays(primitiveType, offset, count);
 };

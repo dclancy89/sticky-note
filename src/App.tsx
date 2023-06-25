@@ -9,13 +9,17 @@ import { useRef, useEffect, useState } from "react";
 
 function App() {
   const canvasRef = useRef(null);
+  const buttonRef = useRef(null);
   const [canvas, setCanvas] = useState<any>(null);
-  const [gl, setGl] = useState(null);
+  const [clearButton, setClearButton] = useState<any>(null);
+  const [gl, setGl] = useState<any>(null);
 
   useEffect(() => {
     const canvas: any = canvasRef.current;
     setCanvas(canvas);
-    const gl = canvas.getContext("webgl2");
+    const button: any = buttonRef.current;
+    setClearButton(button);
+    const gl = canvas.getContext("webgl2", { preserveDrawingBuffer: true });
     setGl(gl);
   }, []);
 
@@ -23,31 +27,65 @@ function App() {
     console.log(gl);
     if (gl) {
       initWebGl({ gl: gl });
+    }
 
-      const stickyNoteContext = initStickyNote({ gl: gl });
-      bindStickyNote({ gl: gl }, stickyNoteContext);
+    if (canvas) {
+      canvas.addEventListener("mousedown", (e: any) => {
+        let rect = canvas.getBoundingClientRect();
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
+
+        const stickyNoteContext = initStickyNote({ gl: gl });
+        bindStickyNote({ gl: gl }, stickyNoteContext);
+
+        drawStickyNote(
+          { gl: gl },
+          stickyNoteContext,
+          { x, y },
+          { r: 1, g: 0, b: 0 }
+        );
+      });
     }
   }, [gl]);
 
   useEffect(() => {
-    canvas.addEventListener("mousedown", (e: any) => {
-      let rect = canvas.getBoundingClientRect();
-      let x = e.clientX - rect.left;
-      let y = e.clientY - rect.top;
+    if (canvas) {
+      canvas.addEventListener("mousedown", (e: any) => {
+        let rect = canvas.getBoundingClientRect();
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
 
-      const stickyNoteContext = initStickyNote({ gl: gl });
-      bindStickyNote({ gl: gl }, stickyNoteContext);
+        const stickyNoteContext = initStickyNote({ gl: gl });
+        bindStickyNote({ gl: gl }, stickyNoteContext);
 
-      drawStickyNote(
-        { gl: gl },
-        stickyNoteContext,
-        { x, y },
-        { r: 1, g: 0, b: 0 }
-      );
-    });
+        drawStickyNote(
+          { gl: gl },
+          stickyNoteContext,
+          { x, y },
+          { r: 1, g: 0, b: 0 }
+        );
+      });
+    }
   }, [canvas]);
 
-  return <canvas ref={canvasRef} id="main" />;
+  useEffect(() => {
+    if (clearButton) {
+      clearButton.addEventListener("click", (e: any) => {
+        console.log("click!");
+        gl.clearColor(0, 0, 0, 0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+      });
+    }
+  }, [clearButton]);
+
+  return (
+    <>
+      <button ref={buttonRef} id="clearButton">
+        Clear
+      </button>
+      <canvas ref={canvasRef} id="main" />
+    </>
+  );
 }
 
 export default App;
