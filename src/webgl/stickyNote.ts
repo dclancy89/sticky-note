@@ -90,11 +90,11 @@ export const drawStickyNote = (
   const offset = 0;
   const count = 6;
 
-  const bx1 = location.x - 2;
-  const bx2 = bx1 + NOTE_WIDTH + 4;
+  const bx1 = location.x + 2;
+  const bx2 = bx1 + NOTE_WIDTH;
 
-  const by1 = location.y - 2;
-  const by2 = by1 + NOTE_HEIGHT + 4;
+  const by1 = location.y + 2;
+  const by2 = by1 + NOTE_HEIGHT;
 
   gl.bufferData(
     gl.ARRAY_BUFFER,
@@ -115,7 +115,7 @@ export const drawStickyNote = (
     gl.STATIC_DRAW
   );
 
-  gl.uniform4f(stickyNoteContext.colorLocation, 0, 0, 0, 1);
+  gl.uniform4f(stickyNoteContext.colorLocation, 0, 0, 0, 0.3);
 
   gl.drawArrays(primitiveType, offset, count);
 

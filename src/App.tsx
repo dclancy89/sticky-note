@@ -62,7 +62,7 @@ function App() {
           { gl: gl },
           stickyNoteContext,
           { x, y },
-          { r: 1, g: 0, b: 0 }
+          { r: 0.78, g: 0.58, b: 0.02 }
         );
       });
     }
